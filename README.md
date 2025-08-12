@@ -1,4 +1,4 @@
-# Leave Management System MVP
+# Leave Management System
 
 ## Overview
 A comprehensive FastAPI-based Leave Management System designed for a startup with 50 employees. The system provides role-based access control with separate Employee and HR portals, enabling efficient leave management with modern authentication and professional user interfaces.
