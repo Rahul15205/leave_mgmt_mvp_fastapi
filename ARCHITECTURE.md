@@ -1,6 +1,6 @@
 # Leave Management System - High Level Design (Enhanced)
 
-##High Level System Design
+## High Level System Design
 
 ## System Architecture Overview
 
