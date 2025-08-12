@@ -1,11 +1,6 @@
 # Leave Management System - High Level Design (Enhanced)
 
-## Part 2 — High Level System Design
-
-This document covers the complete High Level System Design for the Leave Management System MVP, addressing:
-1. **Architecture diagram** (Frontend, Backend, Database)
-2. **API and Database interaction** patterns
-3. **Scaling strategy** from 50 → 500 employees
+##High Level System Design
 
 ## System Architecture Overview
 
