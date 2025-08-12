@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Leave Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-container, .dashboard-container {
+            display: none;
+        }
+
+        .login-container.active, .dashboard-container.active {
+            display: block;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            background: #4CAF50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .response-area {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #4CAF50;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="logout-btn" onclick="logout()" style="display: none;" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+
+        <!-- Login Section -->
+        <div id="loginContainer" class="login-container active">
+            <div class="header">
+                <h1><i class="fas fa-user"></i> Employee Portal</h1>
+                <p>Access your leave management dashboard</p>
+            </div>
+
+            <div class="login-card">
+                <h2>Employee Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="your.email@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginEmployeeId">Employee ID</label>
+                        <input type="number" id="loginEmployeeId" required placeholder="Your employee ID" min="1">
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <div id="loginResponse" class="response-area" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardContainer" class="dashboard-container">
+            <div class="header">
+                <h1><i class="fas fa-user-circle"></i> Welcome, <span id="employeeName">Employee</span>!</h1>
+                <div class="user-info">
+                    <p><strong>Department:</strong> <span id="employeeDepartment">-</span> | 
+                       <strong>Email:</strong> <span id="employeeEmail">-</span></p>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="leaveBalance">0</div>
+                    <div class="stat-label">Leave Balance (Days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRequests">0</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingRequests">0</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="approvedRequests">0</div>
+                    <div class="stat-label">Approved Requests</div>
+                </div>
+            </div>
+
+            <!-- Apply for Leave -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h3>Apply for Leave</h3>
+                </div>
+                <form id="leaveForm">
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i> Submit Leave Request
+                    </button>
+                </form>
+                <div id="leaveResponse" class="response-area" style="display: none;"></div>
+            </div>
+
+            <!-- My Leave Requests -->
+            <div class="table-container">
+                <h3><i class="fas fa-history"></i> My Leave Requests</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Days</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveHistoryBody">
+                        <tr>
+                            <td colspan="5" class="no-data">No leave requests found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let authToken = null;
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('endDate').min = today;
+
+        // Update end date minimum when start date changes
+        document.getElementById('startDate').addEventListener('change', function() {
+            document.getElementById('endDate').min = this.value;
+        });
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const employeeId = parseInt(document.getElementById('loginEmployeeId').value);
+
+            try {
+                const response = await fetch('/auth/employee/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `email=${encodeURIComponent(email)}&employee_id=${employeeId}`
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    authToken = result.access_token;
+                    currentUser = result.user;
+                    showDashboard();
+                } else {
+                    showResponse('loginResponse', `Login failed: ${result.detail}`, 'error');
+                }
+            } catch (error) {
+                showResponse('loginResponse', `Network error: ${error.message}`, 'error');
+            }
+        });
+
+        // Leave Form Handler
+        document.getElementById('leaveForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const leaveData = {
+                employee_id: currentUser.id,
+                start_date: document.getElementById('startDate').value,
+                end_date: document.getElementById('endDate').value
+            };
+
+            await makeAuthenticatedRequest('/employee/leaves/', 'POST', leaveData, 'leaveResponse', () => {
+                document.getElementById('leaveForm').reset();
+                document.getElementById('startDate').min = today;
+                document.getElementById('endDate').min = today;
+                loadLeaveHistory();
+                loadBalance();
+            });
+        });
+
+        // Show Dashboard
+        function showDashboard() {
+            document.getElementById('loginContainer').classList.remove('active');
+            document.getElementById('dashboardContainer').classList.add('active');
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            // Update user info
+            document.getElementById('employeeName').textContent = currentUser.name;
+            document.getElementById('employeeDepartment').textContent = currentUser.department;
+            document.getElementById('employeeEmail').textContent = currentUser.email;
+            document.getElementById('leaveBalance').textContent = currentUser.leave_balance;
+            
+            // Load data
+            loadLeaveHistory();
+            loadBalance();
+        }
+
+        // Load Leave Balance
+        async function loadBalance() {
+            try {
+                const response = await fetch('/employee/balance', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('leaveBalance').textContent = result.balance;
+                }
+            } catch (error) {
+                console.error('Error loading balance:', error);
+            }
+        }
+
+        // Load Leave History
+        async function loadLeaveHistory() {
+            try {
+                const response = await fetch('/employee/leaves', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const leaves = await response.json();
+                    displayLeaveHistory(leaves);
+                    updateStats(leaves);
+                } else {
+                    document.getElementById('leaveHistoryBody').innerHTML = 
+                        '<tr><td colspan="5" class="no-data">Failed to load leave history</td></tr>';
+                }
+            } catch (error) {
+                document.getElementById('leaveHistoryBody').innerHTML = 
+                    '<tr><td colspan="5" class="no-data">Error loading leave history</td></tr>';
+            }
+        }
+
+        // Display Leave History
+        function displayLeaveHistory(leaves) {
+            const tbody = document.getElementById('leaveHistoryBody');
+            
+            if (leaves.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">No leave requests found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = leaves.map(leave => `
+                <tr>
+                    <td>${leave.id}</td>
+                    <td>${new Date(leave.start_date).toLocaleDateString()}</td>
+                    <td>${new Date(leave.end_date).toLocaleDateString()}</td>
+                    <td>${leave.days} days</td>
+                    <td><span class="status-badge status-${leave.status}">${leave.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Update Statistics
+        function updateStats(leaves) {
+            const totalRequests = leaves.length;
+            const pendingRequests = leaves.filter(l => l.status === 'pending').length;
+            const approvedRequests = leaves.filter(l => l.status === 'approved').length;
+
+            document.getElementById('totalRequests').textContent = totalRequests;
+            document.getElementById('pendingRequests').textContent = pendingRequests;
+            document.getElementById('approvedRequests').textContent = approvedRequests;
+        }
+
+        // Make Authenticated Request
+        async function makeAuthenticatedRequest(url, method, data, responseElementId, onSuccess) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(url, options);
+                const result = await response.json();
+
+                if (response.ok) {
+                    showResponse(responseElementId, JSON.stringify(result, null, 2), 'success');
+                    if (onSuccess) onSuccess();
+                } else {
+                    showResponse(responseElementId, `Error: ${result.detail || 'Request failed'}`, 'error');
+                }
+            } catch (error) {
+                showResponse(responseElementId, `Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Show Response
+        function showResponse(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `response-area ${type}`;
+            element.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            authToken = null;
+            document.getElementById('dashboardContainer').classList.remove('active');
+            document.getElementById('loginContainer').classList.add('active');
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+    </script>
+</body>
+</html>
